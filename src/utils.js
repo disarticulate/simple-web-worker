@@ -63,10 +63,14 @@ const makeResponse = work => `
   self.onmessage = function(event) {
     const args = event.data.message.args
     if (args) {
-      self.postMessage((${work}).apply(null, args))
+      let msg = (${work}).apply(null, args)
+      if (msg instanceof Promise) msg.then(self.postMessage)
+      else self.postMessage(msg)
       return close()
     }
-    self.postMessage((${work})())
+    let msg = (${work})()
+    if (msg instanceof Promise) msg.then(self.postMessage)
+    else self.postMessage(msg)
     return close()
   }
 `
