@@ -22,7 +22,44 @@ export default (utilsModule) => {
 `
         expect(actual).toBe(expected)
       })
-
+      test('with an async arrow function', () => {
+        const actual = utilsModule.makeResponse(async () => 'a')
+        const expected = `
+  self.onmessage = function(event) {
+    const args = event.data.message.args
+    if (args) {
+      let msg = (function () {var gen = fn.apply(this, arguments);return new Promise(function (resolve, reject) {function step(key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {return Promise.resolve(value).then(function (value) {step("next", value);}, function (err) {step("throw", err);});}}return step("next");});}).apply(null, args)
+      if (msg instanceof Promise) msg.then(self.postMessage)
+      else self.postMessage(msg)
+      return close()
+    }
+    let msg = (function () {var gen = fn.apply(this, arguments);return new Promise(function (resolve, reject) {function step(key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {return Promise.resolve(value).then(function (value) {step("next", value);}, function (err) {step("throw", err);});}}return step("next");});})()
+    if (msg instanceof Promise) msg.then(self.postMessage)
+    else self.postMessage(msg)
+    return close()
+  }
+`
+        expect(actual).toBe(expected)
+      })
+      test('with an async  function expression', () => {
+        const actual = utilsModule.makeResponse(async function () { return 'a' })
+        const expected = `
+  self.onmessage = function(event) {
+    const args = event.data.message.args
+    if (args) {
+      let msg = (function () {var gen = fn.apply(this, arguments);return new Promise(function (resolve, reject) {function step(key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {return Promise.resolve(value).then(function (value) {step("next", value);}, function (err) {step("throw", err);});}}return step("next");});}).apply(null, args)
+      if (msg instanceof Promise) msg.then(self.postMessage)
+      else self.postMessage(msg)
+      return close()
+    }
+    let msg = (function () {var gen = fn.apply(this, arguments);return new Promise(function (resolve, reject) {function step(key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {return Promise.resolve(value).then(function (value) {step("next", value);}, function (err) {step("throw", err);});}}return step("next");});})()
+    if (msg instanceof Promise) msg.then(self.postMessage)
+    else self.postMessage(msg)
+    return close()
+  }
+`
+        expect(actual).toBe(expected)
+      })
       test('with a function expression', () => {
         const actual = utilsModule.makeResponse(function () { return 'a' })
         const expected = `
